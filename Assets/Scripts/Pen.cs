@@ -19,6 +19,8 @@ public class Pen : MonoBehaviour
     public HandController rightHandController; // 오른손 컨트롤러
     public HandController leftHandController; // 왼손 컨트롤러
 
+    // public LayerManager lm;
+    
     private LineRenderer currentDrawing; // 현재 그리는 선
     private int index;
     private int currentColorIndex;
@@ -61,6 +63,8 @@ public class Pen : MonoBehaviour
             currentDrawing.startWidth = currentDrawing.endWidth = penWidth;
             currentDrawing.positionCount = 1;
             currentDrawing.SetPosition(0, tip.position);
+            // LayerManager의 AddLayer() 함수 호출
+            // lm.AddLayer(currentDrawing.gameObject, 0);  // 예시
         }
         else
         {

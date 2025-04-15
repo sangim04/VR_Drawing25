@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -12,6 +13,8 @@ public class HandController : MonoBehaviour
     public bool isPrimaryPressed; // A 버튼 상태 변수
 
     public Pen pen;
+    
+    public GameObject player;
 
     private void Start()
     {
@@ -23,6 +26,17 @@ public class HandController : MonoBehaviour
 
         isPrimaryPressed = false;
         isTrigger = false;
+        
+        player = GameObject.FindGameObjectWithTag("Player");    // XR Origin에 player태그 설정해야함
+    }
+
+    private void FixedUpdate()
+    {
+        if (isPrimaryPressed)
+        {
+            // player.transform.position = new Vector3(player.transform.position.x, player.transform.position.y + 0.1f, player.transform.position.z);  // 스피드 변수 x (임의)
+            
+        }
     }
 
     void OnTriggerPressed(InputAction.CallbackContext context)
