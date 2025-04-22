@@ -2,26 +2,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.UI; 
 
 public class Pen : MonoBehaviour
 {
     [Header("Pen Properties")]
-    public Transform tip; // ∆Ê ≥° ¿ßƒ°
-    public Material drawingMaterial; //∆Ê ¿Á¡˙
-    public Material tipMaterial; // ∆Ê ªˆªÛ
+    public Transform tip; // Ìéú ÎÅù ÏúÑÏπò
+    public Material drawingMaterial; //Ìéú Ïû¨Ïßà
+    public Material tipMaterial; // Ìéú ÏÉâÏÉÅ
 
     [Range(0.01f, 0.1f)]
-    public float penWidth = 0.01f; //∆Ê ≥ ∫Ò
-    public Color[] penColors; // ªˆªÛ πËø≠
+    public float penWidth = 0.01f; //Ìéú ÎÑàÎπÑ
+    public Color[] penColors; // ÏÉâÏÉÅ Î∞∞Ïó¥
 
     [Header("XR Components")]
-    public XRGrabInteractable grabbable; // XR Interaction Toolkit¿« ¿‚±‚ ±‚¥…
-    public HandController rightHandController; // ø¿∏•º’ ƒ¡∆Æ∑—∑Ø
-    public HandController leftHandController; // øﬁº’ ƒ¡∆Æ∑—∑Ø
+    public XRGrabInteractable grabbable; // XR Interaction ToolkitÏùò Ïû°Í∏∞ Í∏∞Îä•
+    public HandController rightHandController; // Ïò§Î•∏ÏÜê Ïª®Ìä∏Î°§Îü¨
+    public HandController leftHandController; // ÏôºÏÜê Ïª®Ìä∏Î°§Îü¨
+
+    [Header("UI Elements")]
+    public Slider redSlider;
+    public Slider greenSlider;
+    public Slider blueSlider;
+
+    public Button applyColorButton; 
+    public Image colorPreviewImage;
+    public Slider penWidthSlider;
+
 
     public LayerManager lm;
     
-    private LineRenderer currentDrawing; // «ˆ¿Á ±◊∏Æ¥¬ º±
+    private LineRenderer currentDrawing; // ÌòÑÏû¨ Í∑∏Î¶¨Îäî ÏÑ†
     private int index;
     private int currentColorIndex;
 
@@ -29,6 +40,18 @@ public class Pen : MonoBehaviour
     {
         currentColorIndex = 0;
         tipMaterial.color = penColors[currentColorIndex];
+
+        if (applyColorButton != null)
+            applyColorButton.onClick.AddListener(ApplyColorFromSlider); // Î≤ÑÌäºÏóê Ïù¥Î≤§Ìä∏ Ïó∞Í≤∞
+
+        // Ïä¨ÎùºÏù¥Îçî Í∞íÏù¥ Î∞îÎÄî ÎïåÎßàÎã§ ÎØ∏Î¶¨Î≥¥Í∏∞ ÏÉâÏÉÅÎèÑ Î≥ÄÍ≤Ω
+        if (redSlider != null) redSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
+        if (greenSlider != null) greenSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
+        if (blueSlider != null) blueSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
+
+        UpdatePreviewColor(); // Ï¥àÍ∏∞ ÏÉâÎèÑ ÎØ∏Î¶¨ Ï†ÅÏö©
+        if (penWidthSlider != null)
+            UpdatePenWidth(penWidthSlider.value); // Ï¥àÍ∏∞ Ìéú ÍµµÏù¥ Î∞òÏòÅ
     }
 
     private void Update()
@@ -46,10 +69,8 @@ public class Pen : MonoBehaviour
             currentDrawing = null;
         }
 
-        if (rightHandController != null && rightHandController.isPrimaryPressed)
-        {
-            SwitchColor();
-        }
+        if (penWidthSlider != null)
+            UpdatePenWidth(penWidthSlider.value);
     }
 
     private void Draw()
@@ -59,11 +80,11 @@ public class Pen : MonoBehaviour
             index = 0;
             currentDrawing = new GameObject("DrawingLine").AddComponent<LineRenderer>();
             currentDrawing.material = drawingMaterial;
-            currentDrawing.startColor = currentDrawing.endColor = penColors[currentColorIndex];
+            currentDrawing.startColor = currentDrawing.endColor = tipMaterial.color;
             currentDrawing.startWidth = currentDrawing.endWidth = penWidth;
             currentDrawing.positionCount = 1;
             currentDrawing.SetPosition(0, tip.position);
-            // LayerManager¿« AddLayer() «‘ºˆ »£√‚
+            // LayerManagerÏùò AddLayer() Ìï®Ïàò Ìò∏Ï∂ú
             lm.AddLayer(currentDrawing.gameObject);
         }
         else
@@ -78,9 +99,31 @@ public class Pen : MonoBehaviour
         }
     }
 
-    public void SwitchColor()
+    //public void SwitchColor()
+    //{
+    //    currentColorIndex = (currentColorIndex + 1) % penColors.Length;
+    //    tipMaterial.color = penColors[currentColorIndex];
+    //}
+
+    private void ApplyColorFromSlider()
     {
-        currentColorIndex = (currentColorIndex + 1) % penColors.Length;
-        tipMaterial.color = penColors[currentColorIndex];
+        if (redSlider == null || greenSlider == null || blueSlider == null) return;
+
+        Color selectedColor = new Color(redSlider.value, greenSlider.value, blueSlider.value);
+        tipMaterial.color = selectedColor;
+        drawingMaterial.color = selectedColor;
+    }
+
+    private void UpdatePreviewColor()
+    {
+        if (redSlider == null || greenSlider == null || blueSlider == null || colorPreviewImage == null) return;
+
+        Color previewColor = new Color(redSlider.value, greenSlider.value, blueSlider.value);
+        colorPreviewImage.color = previewColor;
+    }
+
+    private void UpdatePenWidth(float value)
+    {
+        penWidth = value;
     }
 }

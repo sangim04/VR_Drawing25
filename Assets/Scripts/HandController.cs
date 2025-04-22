@@ -45,6 +45,5 @@ public class HandController : MonoBehaviour
     void OnPrimaryReleased(InputAction.CallbackContext context)
     {
         isPrimaryPressed = false;
-        pen?.SwitchColor(); // 버튼 눌릴 때 한 번만 실행
     }
 }
