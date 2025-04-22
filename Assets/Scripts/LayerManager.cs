@@ -14,7 +14,7 @@ public class LayerManager : MonoBehaviour
     public InputActionReference primaryButton;      // A 버튼 
     public InputActionReference secondaryButton;    // B 버튼 
     
-    public int layerCount;                  // 레이어 갯수
+    public int layerCount = 2;                  // 레이어 갯수
     private int setactiveLayerIndex = 0;    // 가시성 count
     private int addLayerIndex = 0;          // 추가 count
     // 중간에 layer 추기 기능 아직 없음
