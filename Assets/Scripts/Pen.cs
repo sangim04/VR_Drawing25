@@ -7,18 +7,18 @@ using UnityEngine.UI;
 public class Pen : MonoBehaviour
 {
     [Header("Pen Properties")]
-    public Transform tip; // Ææ ³¡ À§Ä¡
-    public Material drawingMaterial; //Ææ ÀçÁú
-    public Material tipMaterial; // Ææ »ö»ó
+    public Transform tip; // íœ ë ìœ„ì¹˜
+    public Material drawingMaterial; //íœ ì¬ì§ˆ
+    public Material tipMaterial; // íœ ìƒ‰ìƒ
 
     [Range(0.01f, 0.1f)]
-    public float penWidth = 0.01f; //Ææ ³Êºñ
-    public Color[] penColors; // »ö»ó ¹è¿­
+    public float penWidth = 0.01f; //íœ ë„ˆë¹„
+    public Color[] penColors; // ìƒ‰ìƒ ë°°ì—´
 
     [Header("XR Components")]
-    public XRGrabInteractable grabbable; // XR Interaction ToolkitÀÇ Àâ±â ±â´É
-    public HandController rightHandController; // ¿À¸¥¼Õ ÄÁÆ®·Ñ·¯
-    public HandController leftHandController; // ¿Ş¼Õ ÄÁÆ®·Ñ·¯
+    public XRGrabInteractable grabbable; // XR Interaction Toolkitì˜ ì¡ê¸° ê¸°ëŠ¥
+    public HandController rightHandController; // ì˜¤ë¥¸ì† ì»¨íŠ¸ë¡¤ëŸ¬
+    public HandController leftHandController; // ì™¼ì† ì»¨íŠ¸ë¡¤ëŸ¬
 
     [Header("UI Elements")]
     public Slider redSlider;
@@ -29,9 +29,10 @@ public class Pen : MonoBehaviour
     public Image colorPreviewImage;
     public Slider penWidthSlider;
 
-    // public LayerManager lm;
 
-    private LineRenderer currentDrawing; // ÇöÀç ±×¸®´Â ¼±
+    public LayerManager lm;
+    
+    private LineRenderer currentDrawing; // í˜„ì¬ ê·¸ë¦¬ëŠ” ì„ 
     private int index;
     private int currentColorIndex;
 
@@ -41,16 +42,16 @@ public class Pen : MonoBehaviour
         tipMaterial.color = penColors[currentColorIndex];
 
         if (applyColorButton != null)
-            applyColorButton.onClick.AddListener(ApplyColorFromSlider); // ¹öÆ°¿¡ ÀÌº¥Æ® ¿¬°á
+            applyColorButton.onClick.AddListener(ApplyColorFromSlider); // ë²„íŠ¼ì— ì´ë²¤íŠ¸ ì—°ê²°
 
-        // ½½¶óÀÌ´õ °ªÀÌ ¹Ù²ğ ¶§¸¶´Ù ¹Ì¸®º¸±â »ö»óµµ º¯°æ
+        // ìŠ¬ë¼ì´ë” ê°’ì´ ë°”ë€” ë•Œë§ˆë‹¤ ë¯¸ë¦¬ë³´ê¸° ìƒ‰ìƒë„ ë³€ê²½
         if (redSlider != null) redSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
         if (greenSlider != null) greenSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
         if (blueSlider != null) blueSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
 
-        UpdatePreviewColor(); // ÃÊ±â »öµµ ¹Ì¸® Àû¿ë
+        UpdatePreviewColor(); // ì´ˆê¸° ìƒ‰ë„ ë¯¸ë¦¬ ì ìš©
         if (penWidthSlider != null)
-            UpdatePenWidth(penWidthSlider.value); // ÃÊ±â Ææ ±½ÀÌ ¹İ¿µ
+            UpdatePenWidth(penWidthSlider.value); // ì´ˆê¸° íœ êµµì´ ë°˜ì˜
     }
 
     private void Update()
@@ -61,7 +62,7 @@ public class Pen : MonoBehaviour
         if (isGrabbed && isDrawing)
         {
             Draw();
-            Debug.Log($"[Pen] isGrabbed: {grabbable.isSelected}, leftTrigger: {leftHandController?.isTrigger}");
+            //Debug.Log($"[Pen] isGrabbed: {grabbable.isSelected}, leftTrigger: {leftHandController?.isTrigger}");
         }
         else if (currentDrawing != null)
         {
@@ -83,8 +84,8 @@ public class Pen : MonoBehaviour
             currentDrawing.startWidth = currentDrawing.endWidth = penWidth;
             currentDrawing.positionCount = 1;
             currentDrawing.SetPosition(0, tip.position);
-            // LayerManagerÀÇ AddLayer() ÇÔ¼ö È£Ãâ
-            // lm.AddLayer(currentDrawing.gameObject, 0);  // ¿¹½Ã
+            // LayerManagerì˜ AddLayer() í•¨ìˆ˜ í˜¸ì¶œ
+            lm.AddLayer(currentDrawing.gameObject);
         }
         else
         {

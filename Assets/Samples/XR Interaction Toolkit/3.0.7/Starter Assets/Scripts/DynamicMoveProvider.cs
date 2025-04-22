@@ -109,6 +109,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
             m_CombinedTransform.localRotation = Quaternion.identity;
 
             forwardSource = m_CombinedTransform;
+
+            useGravity = false;
         }
 
         /// <inheritdoc />
