@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     
     void Start()
     {
-        primaryButton.action.started += OnPrimaryStarted; // X 버튼 
+        primaryButton.action.started += OnPrimaryStarted;   // X 버튼 
         primaryButton.action.canceled += OnPrimaryReleased; // X 버튼 
         isPrimaryPressed = false;
         
