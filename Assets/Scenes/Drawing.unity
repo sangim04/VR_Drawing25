@@ -386,6 +386,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1720315945917961354, guid: 390b1d7b6239d814db964823d66fbabe, type: 3}
+      propertyPath: m_Text
+      value: "Grab : \uD39C \uC7A1\uAE30\nGrab + Trigger : \uADF8\uB9AC\uAE30\n"
+      objectReference: {fileID: 0}
+    - target: {fileID: 1720315945917961354, guid: 390b1d7b6239d814db964823d66fbabe, type: 3}
       propertyPath: m_Color.b
       value: 0.8660377
       objectReference: {fileID: 0}
