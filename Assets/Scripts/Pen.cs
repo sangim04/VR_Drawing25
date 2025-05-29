@@ -2,7 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEngine.UI; 
+using UnityEngine.UI;
+
+public enum PenCapStyle
+{
+    Rounded,
+    Pointed
+}
 
 public class Pen : MonoBehaviour
 {
@@ -25,13 +31,15 @@ public class Pen : MonoBehaviour
     public Slider greenSlider;
     public Slider blueSlider;
 
-    public Button applyColorButton; 
+    public Button applyColorButton;
     public Image colorPreviewImage;
     public Slider penWidthSlider;
 
+    [Header("Pen Style")]
+    public PenCapStyle capStyle = PenCapStyle.Rounded;
 
     public LayerManager lm;
-    
+
     private LineRenderer currentDrawing; // 현재 그리는 선
     private int index;
     private int currentColorIndex;
@@ -57,12 +65,11 @@ public class Pen : MonoBehaviour
     private void Update()
     {
         bool isGrabbed = grabbable.isSelected;
-        bool isDrawing = ((rightHandController != null && rightHandController.isTrigger) || (leftHandController != null && leftHandController.isTrigger)); 
+        bool isDrawing = ((rightHandController != null && rightHandController.isTrigger) || (leftHandController != null && leftHandController.isTrigger));
 
         if (isGrabbed && isDrawing)
         {
             Draw();
-            //Debug.Log($"[Pen] isGrabbed: {grabbable.isSelected}, leftTrigger: {leftHandController?.isTrigger}");
         }
         else if (currentDrawing != null)
         {
@@ -81,9 +88,40 @@ public class Pen : MonoBehaviour
             currentDrawing = new GameObject("DrawingLine").AddComponent<LineRenderer>();
             currentDrawing.material = drawingMaterial;
             currentDrawing.startColor = currentDrawing.endColor = tipMaterial.color;
-            currentDrawing.startWidth = currentDrawing.endWidth = penWidth;
+
+            // 선 스타일 설정
+            if (capStyle == PenCapStyle.Rounded)
+            {
+                currentDrawing.startWidth = currentDrawing.endWidth = penWidth;
+
+                int capSegments = Mathf.Clamp(Mathf.RoundToInt(penWidth * 1000f), 4, 20);
+                currentDrawing.numCapVertices = capSegments;
+                currentDrawing.numCornerVertices = Mathf.Clamp(capSegments / 2, 2, 10);
+            }
+            else if (capStyle == PenCapStyle.Pointed)
+            {
+                currentDrawing.startWidth = penWidth;
+                currentDrawing.endWidth = penWidth;
+
+                // 선 양 끝을 뾰족하게, 중간은 두껍게 (AnimationCurve로 컨트롤)
+                AnimationCurve taperCurve = new AnimationCurve(
+                    new Keyframe(0f, 0f),                // 시작점 뾰족
+                    new Keyframe(0.2f, 1f),              // 빠르게 두꺼워짐
+                    new Keyframe(0.8f, 1f),              // 중간은 유지
+                    new Keyframe(1f, 0f)                 // 끝점 뾰족
+                );
+
+                currentDrawing.widthCurve = taperCurve;
+                currentDrawing.widthMultiplier = penWidth;
+
+                currentDrawing.numCapVertices = 0;
+                currentDrawing.numCornerVertices = 0;
+            }
+
+            currentDrawing.alignment = LineAlignment.TransformZ;
             currentDrawing.positionCount = 1;
             currentDrawing.SetPosition(0, tip.position);
+
             // LayerManager의 AddLayer() 함수 호출
             lm.AddLayer(currentDrawing.gameObject);
         }
@@ -96,14 +134,13 @@ public class Pen : MonoBehaviour
                 currentDrawing.positionCount = index + 1;
                 currentDrawing.SetPosition(index, tip.position);
             }
+            
+            Debug.Log(currentDrawing.positionCount);
+            
+            Vector2 scale = currentDrawing.material.mainTextureScale;
+            scale.x = 1f * currentDrawing.positionCount;
         }
     }
-
-    //public void SwitchColor()
-    //{
-    //    currentColorIndex = (currentColorIndex + 1) % penColors.Length;
-    //    tipMaterial.color = penColors[currentColorIndex];
-    //}
 
     private void ApplyColorFromSlider()
     {
@@ -126,4 +163,23 @@ public class Pen : MonoBehaviour
     {
         penWidth = value;
     }
+    
+    public static void UpdateTextureScale(LineRenderer line, float textureScaleFactor = 1f)
+    {
+        if (line == null || line.material == null || line.positionCount < 2)
+            return;
+
+        float length = 0f;
+        for (int i = 1; i < line.positionCount; i++)
+        {
+            length += Vector3.Distance(line.GetPosition(i - 1), line.GetPosition(i));
+        }
+
+        // 텍스처 타일링 조정
+        Vector2 scale = line.material.mainTextureScale;
+        scale.x = length * textureScaleFactor;
+        line.material.mainTextureScale = scale;
+    }
+
+
 }
