@@ -12,8 +12,6 @@ public class HandController : MonoBehaviour
     public bool isTrigger;
     public bool isPrimaryPressed; // A 버튼 상태 변수
 
-    public Pen pen;
-
     private void Start()
     {
         triggerButton.action.performed += OnTriggerPressed;

@@ -19,7 +19,6 @@ public class Pen : MonoBehaviour
 
     [Range(0.01f, 0.1f)]
     public float penWidth = 0.01f; //펜 너비
-    public Color[] penColors; // 색상 배열
 
     [Header("XR Components")]
     public XRGrabInteractable grabbable; // XR Interaction Toolkit의 잡기 기능
@@ -27,12 +26,7 @@ public class Pen : MonoBehaviour
     public HandController leftHandController; // 왼손 컨트롤러
 
     [Header("UI Elements")]
-    public Slider redSlider;
-    public Slider greenSlider;
-    public Slider blueSlider;
-
-    public Button applyColorButton;
-    public Image colorPreviewImage;
+    public ColorPicker colorPicker;
     public Slider penWidthSlider;
 
     [Header("Pen Style")]
@@ -42,24 +36,19 @@ public class Pen : MonoBehaviour
 
     private LineRenderer currentDrawing; // 현재 그리는 선
     private int index;
-    private int currentColorIndex;
 
     private void Start()
     {
-        currentColorIndex = 0;
-        tipMaterial.color = penColors[currentColorIndex];
+        if (colorPicker != null)
+        {
+            colorPicker.onColorChanged += ApplyPickedColor;
+            ApplyPickedColor(colorPicker.previewImage.color);
+        }
 
-        if (applyColorButton != null)
-            applyColorButton.onClick.AddListener(ApplyColorFromSlider); // 버튼에 이벤트 연결
-
-        // 슬라이더 값이 바뀔 때마다 미리보기 색상도 변경
-        if (redSlider != null) redSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
-        if (greenSlider != null) greenSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
-        if (blueSlider != null) blueSlider.onValueChanged.AddListener(_ => UpdatePreviewColor());
-
-        UpdatePreviewColor(); // 초기 색도 미리 적용
-        if (penWidthSlider != null)
-            UpdatePenWidth(penWidthSlider.value); // 초기 펜 굵이 반영
+        if (penWidthSlider != null) { 
+            penWidthSlider.onValueChanged.AddListener(UpdatePenWidth);
+            UpdatePenWidth(penWidthSlider.value);
+        }
     }
 
     private void Update()
@@ -75,9 +64,6 @@ public class Pen : MonoBehaviour
         {
             currentDrawing = null;
         }
-
-        if (penWidthSlider != null)
-            UpdatePenWidth(penWidthSlider.value);
     }
 
     private void Draw()
@@ -135,28 +121,17 @@ public class Pen : MonoBehaviour
                 currentDrawing.SetPosition(index, tip.position);
             }
             
-            Debug.Log(currentDrawing.positionCount);
+            //Debug.Log(currentDrawing.positionCount);
             
             Vector2 scale = currentDrawing.material.mainTextureScale;
             scale.x = 1f * currentDrawing.positionCount;
         }
     }
 
-    private void ApplyColorFromSlider()
+    private void ApplyPickedColor(Color c)
     {
-        if (redSlider == null || greenSlider == null || blueSlider == null) return;
-
-        Color selectedColor = new Color(redSlider.value, greenSlider.value, blueSlider.value);
-        tipMaterial.color = selectedColor;
-        drawingMaterial.color = selectedColor;
-    }
-
-    private void UpdatePreviewColor()
-    {
-        if (redSlider == null || greenSlider == null || blueSlider == null || colorPreviewImage == null) return;
-
-        Color previewColor = new Color(redSlider.value, greenSlider.value, blueSlider.value);
-        colorPreviewImage.color = previewColor;
+        tipMaterial.color = c;
+        drawingMaterial.color = c;
     }
 
     private void UpdatePenWidth(float value)
