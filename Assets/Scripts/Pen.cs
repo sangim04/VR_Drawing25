@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public enum PenCapStyle
 {
     Rounded,
-    Pointed
+    //Pointed
 }
 
 public class Pen : MonoBehaviour
@@ -16,6 +16,7 @@ public class Pen : MonoBehaviour
     public Transform tip; // 펜 끝 위치
     public Material drawingMaterial; //펜 재질
     public Material tipMaterial; // 펜 색상
+    public Material dotMaterial; //펜 재질
 
     [Range(0.01f, 0.1f)]
     public float penWidth = 0.01f; //펜 너비
@@ -33,6 +34,10 @@ public class Pen : MonoBehaviour
     public PenCapStyle capStyle = PenCapStyle.Rounded;
 
     public LayerManager lm;
+
+    public bool isDotted;
+    private float scrollSpeed = 1f;
+    List<LineRenderer> lines = new List<LineRenderer>();
 
     private LineRenderer currentDrawing; // 현재 그리는 선
     private int index;
@@ -62,7 +67,30 @@ public class Pen : MonoBehaviour
         }
         else if (currentDrawing != null)
         {
+            // 점선으로 변경
+            /*
+            if (isDotted)
+            {
+                currentDrawing.material.color = tipMaterial.color;
+                currentDrawing.material = dotMaterial;
+                currentDrawing.textureMode = LineTextureMode.Tile;
+                currentDrawing.material.mainTextureScale = new Vector2(currentDrawing.positionCount * 0.01f, 1f);
+                lines.Add(currentDrawing);
+            }
+            */
             currentDrawing = null;
+        }
+        
+        // animation
+        if (lines != null)
+        {
+            foreach (var lineRenderer in lines)
+            {
+                Vector2 offset = lineRenderer.material.mainTextureOffset;
+                offset.x += Time.deltaTime * scrollSpeed;
+                lineRenderer.material.mainTextureOffset = offset;
+                //lineRenderer.material.mainTextureOffset.x += Time.deltaTime * scrollSpeed;
+            }
         }
     }
 
@@ -78,12 +106,14 @@ public class Pen : MonoBehaviour
             // 선 스타일 설정
             if (capStyle == PenCapStyle.Rounded)
             {
+                
                 currentDrawing.startWidth = currentDrawing.endWidth = penWidth;
 
                 int capSegments = Mathf.Clamp(Mathf.RoundToInt(penWidth * 1000f), 4, 20);
                 currentDrawing.numCapVertices = capSegments;
                 currentDrawing.numCornerVertices = Mathf.Clamp(capSegments / 2, 2, 10);
             }
+            /*
             else if (capStyle == PenCapStyle.Pointed)
             {
                 currentDrawing.startWidth = penWidth;
@@ -103,6 +133,7 @@ public class Pen : MonoBehaviour
                 currentDrawing.numCapVertices = 0;
                 currentDrawing.numCornerVertices = 0;
             }
+            */
 
             currentDrawing.alignment = LineAlignment.TransformZ;
             currentDrawing.positionCount = 1;
@@ -110,6 +141,15 @@ public class Pen : MonoBehaviour
 
             // LayerManager의 AddLayer() 함수 호출
             lm.AddLayer(currentDrawing.gameObject);
+            
+            if (isDotted)
+            {
+                currentDrawing.material.color = tipMaterial.color;
+                currentDrawing.material = dotMaterial;
+                currentDrawing.textureMode = LineTextureMode.Tile;
+                currentDrawing.material.mainTextureScale = new Vector2(currentDrawing.positionCount * 0.01f, 1f);
+                lines.Add(currentDrawing);
+            }
         }
         else
         {
@@ -120,11 +160,6 @@ public class Pen : MonoBehaviour
                 currentDrawing.positionCount = index + 1;
                 currentDrawing.SetPosition(index, tip.position);
             }
-            
-            //Debug.Log(currentDrawing.positionCount);
-            
-            Vector2 scale = currentDrawing.material.mainTextureScale;
-            scale.x = 1f * currentDrawing.positionCount;
         }
     }
 

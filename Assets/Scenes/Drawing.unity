@@ -1364,6 +1364,7 @@ MonoBehaviour:
   tip: {fileID: 1581331972}
   drawingMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   tipMaterial: {fileID: 2100000, guid: ad8b4f0a15bf2cb47911d0d544bfb919, type: 2}
+  dotMaterial: {fileID: 2100000, guid: 92677ed93c560e34caf6703bfa82ad31, type: 2}
   penWidth: 0.01
   grabbable: {fileID: 944873447}
   rightHandController: {fileID: 1022018537}
@@ -1372,6 +1373,7 @@ MonoBehaviour:
   penWidthSlider: {fileID: 1354954350}
   capStyle: 0
   lm: {fileID: 1125884402}
+  isDotted: 0
 --- !u!114 &944873447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1784,7 +1786,6 @@ MonoBehaviour:
   primaryButton: {fileID: 4090067851043596401, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   isTrigger: 0
   isPrimaryPressed: 0
-  pen: {fileID: 0}
 --- !u!1 &1125884401
 GameObject:
   m_ObjectHideFlags: 0
@@ -2741,7 +2742,6 @@ MonoBehaviour:
   primaryButton: {fileID: 0}
   isTrigger: 0
   isPrimaryPressed: 0
-  pen: {fileID: 0}
 --- !u!4 &6693052527556595828 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 202364688, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
