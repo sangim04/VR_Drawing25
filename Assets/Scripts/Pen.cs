@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public enum PenCapStyle
 {
     Rounded,
-    //Pointed
+    Pointed
 }
 
 public class Pen : MonoBehaviour
@@ -16,7 +16,7 @@ public class Pen : MonoBehaviour
     public Transform tip; // 펜 끝 위치
     public Material drawingMaterial; //펜 재질
     public Material tipMaterial; // 펜 색상
-    public Material dotMaterial; //펜 재질
+    public Material rainbowMaterial; //펜 재질
 
     [Range(0.01f, 0.1f)]
     public float penWidth = 0.01f; //펜 너비
@@ -35,7 +35,7 @@ public class Pen : MonoBehaviour
 
     public LayerManager lm;
 
-    public bool isDotted;
+    public bool isRainbowColor;
     private float scrollSpeed = 1f;
     List<LineRenderer> lines = new List<LineRenderer>();
 
@@ -67,17 +67,6 @@ public class Pen : MonoBehaviour
         }
         else if (currentDrawing != null)
         {
-            // 점선으로 변경
-            /*
-            if (isDotted)
-            {
-                currentDrawing.material.color = tipMaterial.color;
-                currentDrawing.material = dotMaterial;
-                currentDrawing.textureMode = LineTextureMode.Tile;
-                currentDrawing.material.mainTextureScale = new Vector2(currentDrawing.positionCount * 0.01f, 1f);
-                lines.Add(currentDrawing);
-            }
-            */
             currentDrawing = null;
         }
         
@@ -113,7 +102,6 @@ public class Pen : MonoBehaviour
                 currentDrawing.numCapVertices = capSegments;
                 currentDrawing.numCornerVertices = Mathf.Clamp(capSegments / 2, 2, 10);
             }
-            /*
             else if (capStyle == PenCapStyle.Pointed)
             {
                 currentDrawing.startWidth = penWidth;
@@ -133,7 +121,6 @@ public class Pen : MonoBehaviour
                 currentDrawing.numCapVertices = 0;
                 currentDrawing.numCornerVertices = 0;
             }
-            */
 
             currentDrawing.alignment = LineAlignment.TransformZ;
             currentDrawing.positionCount = 1;
@@ -142,12 +129,12 @@ public class Pen : MonoBehaviour
             // LayerManager의 AddLayer() 함수 호출
             lm.AddLayer(currentDrawing.gameObject);
             
-            if (isDotted)
+            if (isRainbowColor)
             {
                 currentDrawing.material.color = tipMaterial.color;
-                currentDrawing.material = dotMaterial;
+                currentDrawing.material = rainbowMaterial;
                 currentDrawing.textureMode = LineTextureMode.Tile;
-                currentDrawing.material.mainTextureScale = new Vector2(currentDrawing.positionCount * 0.01f, 1f);
+                currentDrawing.material.mainTextureScale = new Vector2(currentDrawing.positionCount * 1f, 1f);
                 lines.Add(currentDrawing);
             }
         }

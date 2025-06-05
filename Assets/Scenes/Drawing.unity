@@ -1364,7 +1364,7 @@ MonoBehaviour:
   tip: {fileID: 1581331972}
   drawingMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   tipMaterial: {fileID: 2100000, guid: ad8b4f0a15bf2cb47911d0d544bfb919, type: 2}
-  dotMaterial: {fileID: 2100000, guid: 92677ed93c560e34caf6703bfa82ad31, type: 2}
+  rainbowMaterial: {fileID: 2100000, guid: 92677ed93c560e34caf6703bfa82ad31, type: 2}
   penWidth: 0.01
   grabbable: {fileID: 944873447}
   rightHandController: {fileID: 1022018537}
@@ -1373,7 +1373,7 @@ MonoBehaviour:
   penWidthSlider: {fileID: 1354954350}
   capStyle: 0
   lm: {fileID: 1125884402}
-  isDotted: 0
+  isRainbowColor: 1
 --- !u!114 &944873447
 MonoBehaviour:
   m_ObjectHideFlags: 0
