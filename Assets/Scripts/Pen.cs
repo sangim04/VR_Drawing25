@@ -43,6 +43,7 @@ public class Pen : MonoBehaviour
     private int index;
     
     public GameObject[] penObjects;
+    public GameObject rainbowUI;    //귀찮아서 잠깐 만든 무지개 버튼 토글 이미지
 
     private void Start()
     {
@@ -202,5 +203,6 @@ public class Pen : MonoBehaviour
     public void RainbowColorChanged()
     {
         isRainbowColor = !isRainbowColor;
+        rainbowUI.SetActive(!rainbowUI.activeSelf);
     }
 }
