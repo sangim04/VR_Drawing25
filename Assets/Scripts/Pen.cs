@@ -41,6 +41,8 @@ public class Pen : MonoBehaviour
 
     private LineRenderer currentDrawing; // 현재 그리는 선
     private int index;
+    
+    public GameObject[] penObjects;
 
     private void Start()
     {
@@ -178,5 +180,27 @@ public class Pen : MonoBehaviour
         line.material.mainTextureScale = scale;
     }
 
+    public void CapStyleRounded() => CapStyleChanged(PenCapStyle.Rounded);
+    public void CapStylePointed() => CapStyleChanged(PenCapStyle.Pointed);
 
+    private void CapStyleChanged(PenCapStyle newCapStyle)
+    {
+        capStyle = newCapStyle;
+        switch (newCapStyle)
+        {
+            case PenCapStyle.Rounded:
+                penObjects[0].SetActive(true);
+                penObjects[1].SetActive(false);
+                break;
+            case PenCapStyle.Pointed:
+                penObjects[0].SetActive(false);
+                penObjects[1].SetActive(true);
+                break;
+        }
+    }
+    
+    public void RainbowColorChanged()
+    {
+        isRainbowColor = !isRainbowColor;
+    }
 }

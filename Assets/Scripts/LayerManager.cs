@@ -1,24 +1,30 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class LayerManager : MonoBehaviour
 {
-    public InputActionReference primaryButton;      // A 버튼 
-    public InputActionReference secondaryButton;    // B 버튼 
-    
-    public int layerCount = 2;              // 레이어 갯수
-    private int setactiveLayerIndex = 0;    // 가시성 count
-    private int addLayerIndex = 0;          // 추가 count
+    public InputActionReference primaryButton; // A 버튼 
+    public InputActionReference secondaryButton; // B 버튼 
+
+    public int layerCount = 2; // 레이어 갯수
+
+    //private int setactiveLayerIndex = 0;    // 가시성 count
+    private int addLayerIndex = 0; // 추가 count
+
     // 중간에 layer 추기 기능 아직 없음
     // 레이어 삭제 기능 아직 없음
     // HandController 안씀
+    private List<bool> layerIsSetActive = new List<bool>();
+    public List<Material> skyBoxList = new List<Material>();
+    private int currentSkyBoxIndex = 0;
     
     private static List<List<GameObject>> currentLayer = new List<List<GameObject>>();    // 현재 레이어
 
     public Text layerText;         // 현재 그려질 레이어 text, Inspector창에서 넣어줘야 함
+    public Text layerPenText;      // 현재 그려질 레이어를 팬에도 표시함, Inspector창에서 넣어줘야 함
     
     /*
      * setactiveLayerIndex는 몇번째 레이어가 보이게 할지 안보이게 할지
@@ -34,13 +40,18 @@ public class LayerManager : MonoBehaviour
         {
             currentLayer.Add(new List<GameObject>());
         }
+        
+        layerIsSetActive.Add(true);
+        layerIsSetActive.Add(true);
     }
 
     public void AddLayer(GameObject layer)  // 현재 레이어 List에 추가
     {
         currentLayer[addLayerIndex].Add(layer);
+        layer.SetActive(layerIsSetActive[addLayerIndex]);
     }
 
+    /*
     private void LayerSetActive()   // 레이어 가시성
     {
         setactiveLayerIndex++;
@@ -65,20 +76,46 @@ public class LayerManager : MonoBehaviour
             }
         }
     }
+    */
+    
+    public void LayerSetActive(int layerNumber)   // 레이어 가시성
+    {
+        foreach (var obj in currentLayer[layerNumber])
+        {
+            obj.SetActive(!obj.activeSelf); // 보이면 안보이게, 안보이면 보이게
+        }
 
+        layerIsSetActive[layerNumber] = !layerIsSetActive[layerNumber];
+    }
+    
+    private void SkyBoxChanged()   // 배경바꾸기
+    {
+        RenderSettings.skybox = skyBoxList[currentSkyBoxIndex++];
+        if (currentSkyBoxIndex >= skyBoxList.Count) currentSkyBoxIndex = 0;
+    }
+    
     void OnPrimaryStarted(InputAction.CallbackContext context)
     {
         addLayerIndex++;
         if (addLayerIndex >= layerCount) addLayerIndex = 0;
         
         /* 레이어를 두개 사용할때만 정상 작동함 임의로 만든 기능, 향후 수정 필요 */
-        if(addLayerIndex == 1) layerText.text = "Current Layer : B";
-        else layerText.text = "Current Layer : A";
+        if (addLayerIndex == 1)
+        {
+            layerText.text = "B";
+            layerPenText.text = "B";
+        }
+        else
+        {
+            layerText.text = "A";
+            layerPenText.text = "A";
+        }
     }
     
     void OnSecondaryStarted(InputAction.CallbackContext context)
     {
-        LayerSetActive();
+        // LayerSetActive();
+        SkyBoxChanged();
     }
 }
 
